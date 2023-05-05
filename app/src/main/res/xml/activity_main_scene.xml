@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:motion="http://schemas.android.com/apk/res-auto">
+
+    <Transition
+        motion:constraintSetEnd="@+id/end"
+        motion:constraintSetStart="@+id/start"
+        motion:duration="400"
+        motion:motionInterpolator="easeInOut"
+        >
+        <OnSwipe
+            motion:dragDirection="dragUp"
+            motion:touchRegionId="@+id/player_floating"
+            motion:onTouchUp="decelerateAndComplete"
+            motion:touchAnchorSide="end" />
+    </Transition>
+
+    <ConstraintSet android:id="@+id/end">
+        <Constraint android:id="@+id/player_floating">
+            <Layout android:layout_height="match_parent"
+                android:layout_width="match_parent" />
+            <CustomAttribute
+                motion:attributeName="Radius"
+                motion:customDimension="0dp" />
+        </Constraint>
+
+        <ConstraintOverride
+            android:id="@id/player"
+            android:layout_height="wrap_content">
+        </ConstraintOverride>
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/start">
+        <Constraint android:id="@+id/player_floating">
+            <CustomAttribute
+                motion:attributeName="Radius"
+                motion:customDimension="18dp" />
+        </Constraint>
+    </ConstraintSet>
+</MotionScene>
