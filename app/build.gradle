@@ -29,6 +29,8 @@ android {
 }
 
 dependencies {
+    implementation "com.github.permissions-dispatcher:permissionsdispatcher:4.9.2"
+    annotationProcessor "com.github.permissions-dispatcher:permissionsdispatcher-processor:4.9.2"
     implementation "com.github.ozgurg:ToggleIconView:3.0.2"
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.8.0'
