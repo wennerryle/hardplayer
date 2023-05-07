@@ -11,6 +11,7 @@ import android.widget.CheckBox;
 
 import com.example.hardplayer.data.Playlist;
 import com.example.hardplayer.ui.components.playlistcarousel.RecycleViewPlaylistAdapter;
+import com.google.android.material.color.DynamicColors;
 
 import java.util.ArrayList;
 
@@ -21,7 +22,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         RecyclerView playlists = findViewById(R.id.playlists);
 
         playlists.setLayoutManager(
