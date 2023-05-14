@@ -1,22 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
+    android:paddingBottom="114dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/header_title"
+        android:id="@+id/main_screen_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="20dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="48dp"
         android:text="Главная"
         android:textColor="@color/black"
         android:textSize="28sp"
         android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/header_playlists"
+        android:id="@+id/main_screen_playlists"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="20dp"
@@ -26,7 +27,7 @@
         android:textStyle="bold" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/playlists"
+        android:id="@+id/main_screen_recycler_view_playlists"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:scrollbars="horizontal"
@@ -36,18 +37,24 @@
         android:clipToPadding="false" />
 
     <com.google.android.material.tabs.TabLayout
+        android:id="@+id/main_screen_tab_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <com.google.android.material.tabs.TabItem
+            android:id="@+id/main_screen_tab_favourites"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Избранные"
             />
 
         <com.google.android.material.tabs.TabItem
+            android:id="@+id/main_screen_tab_all_tracks"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Все треки"
             />
     </com.google.android.material.tabs.TabLayout>
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/main_screen_viewpager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 </LinearLayout>

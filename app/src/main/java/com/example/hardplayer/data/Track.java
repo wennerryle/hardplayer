@@ -4,11 +4,13 @@ public class Track {
     Playlist playlist;
     String name;
     String author;
+    Boolean isFavorite;
 
-    public Track(Playlist playlist, String name, String author) {
+    public Track(Playlist playlist, String name, String author, Boolean isFavorite) {
         this.playlist = playlist;
         this.name = name;
         this.author = author;
+        this.isFavorite = isFavorite;
     }
 
     public Playlist getPlaylist() {
@@ -21,5 +23,9 @@ public class Track {
 
     public String getAuthor() {
         return author;
+    }
+
+    public boolean getIsFavorite() {
+        return isFavorite;
     }
 }

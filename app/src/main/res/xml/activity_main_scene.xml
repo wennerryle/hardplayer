@@ -11,8 +11,13 @@
         <OnSwipe
             motion:dragDirection="dragUp"
             motion:touchRegionId="@+id/player_floating"
-            motion:onTouchUp="decelerateAndComplete"
+            motion:onTouchUp="autoComplete"
             motion:touchAnchorSide="end" />
+        <KeyFrameSet>
+            <KeyPosition
+                motion:motionTarget="@+id/player_favorite_checkbox"
+                motion:framePosition="70" />
+        </KeyFrameSet>
     </Transition>
 
     <ConstraintSet android:id="@+id/end">
