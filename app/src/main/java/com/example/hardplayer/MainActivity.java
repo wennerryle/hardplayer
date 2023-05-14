@@ -67,6 +67,8 @@ public class MainActivity extends AppCompatActivity {
 
         playlists.setAdapter(new RecycleViewPlaylistAdapter(playlistsData));
 
+        viewPager.setOffscreenPageLimit(2);
+
         viewPager.setAdapter(
                 new ViewPagerAdapter(getSupportFragmentManager(),
                 getLifecycle())
