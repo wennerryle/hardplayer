@@ -16,11 +16,11 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
 
     @NonNull
     @Override
-    public Fragment createFragment(int position) {
-        if (position == 0)
-            return new AllTracksFragment();
-        else
-            return new FavoriteTracksFragment();
+    public Fragment createFragment(int tabIndex) {
+        return switch (tabIndex) {
+            case 0 -> new AllTracksFragment();
+            default -> new FavoriteTracksFragment();
+        };
     }
 
     @Override
