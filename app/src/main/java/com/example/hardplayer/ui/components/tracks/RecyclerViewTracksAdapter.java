@@ -14,7 +14,12 @@ import com.example.hardplayer.ui.components.playlistcarousel.RecycleViewPlaylist
 import java.util.ArrayList;
 
 public class RecyclerViewTracksAdapter extends RecyclerView.Adapter<TracksHolder> {
-    ArrayList<Track> tracks = new ArrayList<>();
+    private ArrayList<Track> tracks = new ArrayList<>();
+
+    public void setTracks(ArrayList<Track> tracks) {
+        this.tracks = tracks;
+        this.notifyDataSetChanged();
+    }
 
     public RecyclerViewTracksAdapter(ArrayList<Track> tracks) {
         this.tracks = tracks;

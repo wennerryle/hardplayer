@@ -92,6 +92,7 @@
                 android:layout_width="26dp"
                 android:layout_height="26dp"
                 android:layout_marginRight="8dp"
+                android:alpha="0"
                 android:button="@drawable/star_selector"
                 android:buttonTint="@color/button_tint_white"
                 app:layout_constraintBottom_toBottomOf="@+id/player_track_author"

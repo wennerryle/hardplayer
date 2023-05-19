@@ -12,7 +12,12 @@ import com.example.hardplayer.data.Playlist;
 import java.util.ArrayList;
 
 public class RecycleViewPlaylistAdapter extends RecyclerView.Adapter<PlaylistHolder> {
-    ArrayList<Playlist> playlists;
+    private ArrayList<Playlist> playlists;
+
+    public void setPlaylists(ArrayList<Playlist> playlists) {
+        this.playlists = playlists;
+        this.notifyDataSetChanged();
+    }
 
     public RecycleViewPlaylistAdapter(ArrayList<Playlist> playlists) {
         this.playlists = playlists;

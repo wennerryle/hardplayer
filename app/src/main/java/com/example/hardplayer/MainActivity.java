@@ -26,6 +26,7 @@ import com.example.hardplayer.utils.Debouncer;
 import com.google.android.material.tabs.TabLayoutMediator;
 
 import java.util.ArrayList;
+import java.util.concurrent.CompletableFuture;
 
 import og.android.lib.toggleiconview.ToggleIconView;
 import permissions.dispatcher.NeedsPermission;
@@ -60,12 +61,21 @@ public class MainActivity extends AppCompatActivity {
 
         ArrayList<Playlist> playlistsData = new ArrayList<>();
 
-        // TODO: TEST DATA! REMOVE IT.
-        for(int i = 0; i < 20; i++) {
-            playlistsData.add(new Playlist("Ромашки", null, "DVRST, Mamba"));
-        }
+        CompletableFuture<ArrayList<Playlist>> future = CompletableFuture.supplyAsync(() -> {
+            for(int i = 0; i < 200; i++) {
+                playlistsData.add(new Playlist("Ромашки", null, "DVRST, Mamba"));
+            }
 
-        playlists.setAdapter(new RecycleViewPlaylistAdapter(playlistsData));
+            return playlistsData;
+        });
+
+        RecycleViewPlaylistAdapter adapterPlaylists = new RecycleViewPlaylistAdapter(playlistsData);
+
+        playlists.setAdapter(adapterPlaylists);
+
+        future.thenAccept(result -> {
+            adapterPlaylists.setPlaylists(result);
+        });
 
         viewPager.setOffscreenPageLimit(2);
 
@@ -85,24 +95,24 @@ public class MainActivity extends AppCompatActivity {
             ((ToggleIconView) button.findViewById(R.id.avd_play_and_stop)).toggle();
         });
 
-        Debouncer backTimerAnimation = new Debouncer(() -> {
-            favoriteCheckbox.setAlpha(playerAnimationProgress * 2);
-            backTimerCollapsed.setAlpha(1 - playerAnimationProgress * 6);
-
-            if (playerAnimationProgress < 0.1f)
-                favoriteCheckbox.setVisibility(View.GONE);
-            else
-                favoriteCheckbox.setVisibility(View.VISIBLE);
-        }, 100);
-
         ((MotionLayout) findViewById(R.id.player_background)).setTransitionListener(new TransitionAdapter() {
             @Override
             public void onTransitionChange(MotionLayout motionLayout, int startId, int endId, float progress) {
                 playerAnimationProgress = progress;
-                backTimerCollapsed.post(backTimerAnimation::run);
+                backTimerCollapsed.post(() -> {
+                    favoriteCheckbox.setAlpha(playerAnimationProgress * 2);
+                    backTimerCollapsed.setAlpha(1 - playerAnimationProgress * 6);
+
+                    if (playerAnimationProgress < 0.1f)
+                        favoriteCheckbox.setVisibility(View.GONE);
+                    else
+                        favoriteCheckbox.setVisibility(View.VISIBLE);
+                });
             }
         });
 
+
+        requestStorage();
         MainActivityPermissionsDispatcher.requestStorageWithPermissionCheck(this);
     }
 

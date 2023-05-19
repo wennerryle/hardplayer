@@ -13,6 +13,7 @@ import com.example.hardplayer.data.Track;
 import com.example.hardplayer.ui.components.trackslist.TrackListView;
 
 import java.util.ArrayList;
+import java.util.concurrent.CompletableFuture;
 
 public class FavoriteTracksFragment extends Fragment {
     @Override
@@ -24,11 +25,19 @@ public class FavoriteTracksFragment extends Fragment {
         TrackListView trackListView = view.findViewById(R.id.favorite_tracks_view);
 
         ArrayList<Track> tracksData = new ArrayList<>();
-        for(int i = 0; i < 100; i++) {
-            tracksData.add(new Track(null, "I Hate You I Love You", "DVRST", true));
-        }
 
         trackListView.setTracks(tracksData);
+
+        CompletableFuture<Void> future = CompletableFuture.supplyAsync(() -> {
+            for(int i = 0; i < 100; i++) {
+                tracksData.add(new Track(null, "I Hate You I Love You", "DVRST", true));
+            }
+            return null;
+        });
+
+        future.thenAccept(__ -> {
+            trackListView.setTracks(tracksData);
+        });
 
         return view;
     }

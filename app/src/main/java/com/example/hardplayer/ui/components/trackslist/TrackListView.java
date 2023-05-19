@@ -1,6 +1,5 @@
 package com.example.hardplayer.ui.components.trackslist;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -21,6 +20,7 @@ public class TrackListView extends LinearLayout {
     ArrayList<Track> tracks = new ArrayList<>();
     private RecyclerView recyclerView;
     private TextView warningTextView;
+    public RecyclerViewTracksAdapter recyclerViewTracksAdapter;
 
     public TrackListView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -37,7 +37,9 @@ public class TrackListView extends LinearLayout {
         recyclerView = (RecyclerView) getChildAt(0);
         warningTextView = (TextView) getChildAt(1);
 
-        recyclerView.setAdapter(new RecyclerViewTracksAdapter(tracks));
+        recyclerViewTracksAdapter = new RecyclerViewTracksAdapter(tracks);
+
+        recyclerView.setAdapter(recyclerViewTracksAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         // recyclerview is not visible if items count is 0
@@ -57,7 +59,7 @@ public class TrackListView extends LinearLayout {
 
     public void setTracks(ArrayList<Track> tracks) {
         this.tracks = tracks;
-        recyclerView.setAdapter(new RecyclerViewTracksAdapter(tracks));
+        recyclerViewTracksAdapter.setTracks(this.tracks);
         checkCountsTrack();
     }
 }

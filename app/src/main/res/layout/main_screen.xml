@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:paddingBottom="114dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <ImageView
+        app:layout_scrollFlags="scroll|snap"
         android:paddingLeft="24dp"
-        android:paddingTop="60dp"
+        android:paddingTop="54dp"
         android:paddingBottom="16dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -15,6 +17,7 @@
         />
 
     <androidx.recyclerview.widget.RecyclerView
+        app:layout_scrollFlags="scroll|snap"
         android:id="@+id/main_screen_recycler_view_playlists"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
