@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hardplayer.R;
-import com.example.hardplayer.data.Track;
+import com.example.hardplayer.models.Track;
 import com.example.hardplayer.ui.components.tracks.RecyclerViewTracksAdapter;
 
 import java.util.ArrayList;

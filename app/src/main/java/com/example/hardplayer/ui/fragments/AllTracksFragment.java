@@ -9,8 +9,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.hardplayer.R;
-import com.example.hardplayer.data.Track;
+import com.example.hardplayer.models.Playlist;
+import com.example.hardplayer.models.Track;
 import com.example.hardplayer.ui.components.trackslist.TrackListView;
+import com.example.hardplayer.utils.SharedThreads;
 
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
@@ -31,16 +33,14 @@ public class AllTracksFragment extends Fragment {
 
         trackListView.setTracks(tracksData);
 
-        CompletableFuture<Void> future = CompletableFuture.supplyAsync(() -> {
-            for(int i = 0; i < 100; i++) {
-                tracksData.add(new Track(null, "I Hate You I Love You", "DVRST", true));
+        CompletableFuture.supplyAsync(() -> {
+            for(int i = 0; i < 200; i++) {
+                tracksData.add(new Track(null, "I Hate I Love You", "DVRST", true));
             }
-            return null;
-        });
 
-        future.thenAccept(__ -> {
             trackListView.setTracks(tracksData);
-        });
+            return null;
+        }, SharedThreads.getExecutorService()).thenRunAsync(() -> {});
 
         return view;
     }

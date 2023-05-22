@@ -1,4 +1,4 @@
-package com.example.hardplayer.data;
+package com.example.hardplayer.models;
 
 public class Track {
     Playlist playlist;

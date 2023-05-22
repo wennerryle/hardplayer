@@ -8,7 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hardplayer.R;
-import com.example.hardplayer.data.Playlist;
+import com.example.hardplayer.models.Playlist;
 import java.util.ArrayList;
 
 public class RecycleViewPlaylistAdapter extends RecyclerView.Adapter<PlaylistHolder> {

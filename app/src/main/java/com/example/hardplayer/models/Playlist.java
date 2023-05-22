@@ -1,4 +1,4 @@
-package com.example.hardplayer.data;
+package com.example.hardplayer.models;
 
 import android.widget.ImageView;
 

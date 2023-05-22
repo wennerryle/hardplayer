@@ -8,8 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hardplayer.R;
-import com.example.hardplayer.data.Track;
-import com.example.hardplayer.ui.components.playlistcarousel.RecycleViewPlaylistAdapter;
+import com.example.hardplayer.models.Track;
 
 import java.util.ArrayList;
 

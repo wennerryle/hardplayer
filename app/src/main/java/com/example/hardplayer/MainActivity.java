@@ -10,25 +10,30 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
+import android.content.ContentResolver;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.provider.Settings;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.hardplayer.data.Playlist;
+import com.example.hardplayer.models.Playlist;
 import com.example.hardplayer.ui.components.playlistcarousel.RecycleViewPlaylistAdapter;
 import com.example.hardplayer.ui.components.viewpager.ViewPagerAdapter;
-import com.example.hardplayer.utils.Debouncer;
+import com.example.hardplayer.utils.SharedThreads;
 import com.google.android.material.tabs.TabLayoutMediator;
 
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 
 import og.android.lib.toggleiconview.ToggleIconView;
+
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.OnNeverAskAgain;
 import permissions.dispatcher.OnPermissionDenied;
@@ -54,28 +59,24 @@ public class MainActivity extends AppCompatActivity {
         backTimerCollapsed = findViewById(R.id.player_back_timer_collapsed);
 
         RecyclerView playlists = findViewById(R.id.main_screen_recycler_view_playlists);
-
         playlists.setLayoutManager(
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         );
 
         ArrayList<Playlist> playlistsData = new ArrayList<>();
 
-        CompletableFuture<ArrayList<Playlist>> future = CompletableFuture.supplyAsync(() -> {
+        RecycleViewPlaylistAdapter adapterPlaylists = new RecycleViewPlaylistAdapter(playlistsData);
+
+        CompletableFuture.supplyAsync(() -> {
             for(int i = 0; i < 200; i++) {
                 playlistsData.add(new Playlist("Ромашки", null, "DVRST, Mamba"));
             }
 
-            return playlistsData;
-        });
-
-        RecycleViewPlaylistAdapter adapterPlaylists = new RecycleViewPlaylistAdapter(playlistsData);
+            adapterPlaylists.setPlaylists(playlistsData);
+            return null;
+        }, SharedThreads.getExecutorService()).thenRunAsync(() -> {});
 
         playlists.setAdapter(adapterPlaylists);
-
-        future.thenAccept(result -> {
-            adapterPlaylists.setPlaylists(result);
-        });
 
         viewPager.setOffscreenPageLimit(2);
 
@@ -93,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
 
         findViewById(R.id.player_play_button).setOnClickListener(button -> {
             ((ToggleIconView) button.findViewById(R.id.avd_play_and_stop)).toggle();
+            MainActivityPermissionsDispatcher.getSongsWithPermissionCheck(this);
         });
 
         ((MotionLayout) findViewById(R.id.player_background)).setTransitionListener(new TransitionAdapter() {
@@ -110,15 +112,33 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         });
-
-
-        requestStorage();
-        MainActivityPermissionsDispatcher.requestStorageWithPermissionCheck(this);
     }
 
+    @SuppressLint("Range")
     @NeedsPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
-    void requestStorage() {
-        System.out.println("It's work!");
+    void getSongs() {
+        ContentResolver contentResolver = this.getContentResolver();
+        Uri songUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        Cursor cursor = contentResolver.query(songUri,
+                null,
+                null,
+                null,
+                null);
+
+        if (cursor == null) return;
+
+        cursor.moveToFirst();
+
+        do {
+            System.out.println("id " + cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media._ID)));
+            System.out.println("title " + cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)));
+            System.out.println("artist " + cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)));
+            System.out.println("data " + cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA)));
+            System.out.println("date added " + cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATE_ADDED)));
+            System.out.println("album id " + cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID)));
+        } while (cursor.moveToNext());
+
+        cursor.close();
     }
 
     @OnShowRationale(Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -145,8 +165,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         MainActivityPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     public void showSettingsOfApp() {
