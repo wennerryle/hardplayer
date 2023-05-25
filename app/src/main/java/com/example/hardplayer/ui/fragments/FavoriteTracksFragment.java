@@ -29,15 +29,6 @@ public class FavoriteTracksFragment extends Fragment {
 
         trackListView.setTracks(tracksData);
 
-        CompletableFuture.supplyAsync(() -> {
-            for(int i = 0; i < 200; i++) {
-                tracksData.add(new Track(null, "I Hate I Love You", "DVRST", true));
-            }
-
-            trackListView.setTracks(tracksData);
-            return null;
-        }, SharedThreads.getExecutorService()).thenRunAsync(() -> {});
-
         return view;
     }
 }

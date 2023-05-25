@@ -5,6 +5,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.constraintlayout.motion.widget.TransitionAdapter;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
@@ -43,48 +44,39 @@ import permissions.dispatcher.RuntimePermissions;
 
 @RuntimePermissions
 public class MainActivity extends AppCompatActivity {
-    float playerAnimationProgress = 0;
-    CheckBox favoriteCheckbox;
-    ViewPager2 viewPager;
-    TextView backTimerCollapsed;
+    private MainViewModel vm;
+    private CheckBox favoriteCheckbox;
+    private ViewPager2 viewPager;
+    private TextView backTimerCollapsed;
+    private float playerAnimationProgress = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        vm = new ViewModelProvider(this).get(MainViewModel.class);
+
         // init components
         favoriteCheckbox = findViewById(R.id.player_favorite_checkbox);
         viewPager = findViewById(R.id.main_screen_viewpager);
         backTimerCollapsed = findViewById(R.id.player_back_timer_collapsed);
 
-        RecyclerView playlists = findViewById(R.id.main_screen_recycler_view_playlists);
-        playlists.setLayoutManager(
+        RecyclerView playlistsRV = findViewById(R.id.main_screen_recycler_view_playlists);
+        playlistsRV.setLayoutManager(
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         );
 
-        ArrayList<Playlist> playlistsData = new ArrayList<>();
+        RecycleViewPlaylistAdapter adapterPlaylists = new RecycleViewPlaylistAdapter();
+        adapterPlaylists.setPlaylists(vm.playlists);
+        playlistsRV.setAdapter(adapterPlaylists);
 
-        RecycleViewPlaylistAdapter adapterPlaylists = new RecycleViewPlaylistAdapter(playlistsData);
-
-        CompletableFuture.supplyAsync(() -> {
-            for(int i = 0; i < 200; i++) {
-                playlistsData.add(new Playlist("Ромашки", null, "DVRST, Mamba"));
-            }
-
-            adapterPlaylists.setPlaylists(playlistsData);
-            return null;
-        }, SharedThreads.getExecutorService()).thenRunAsync(() -> {});
-
-        playlists.setAdapter(adapterPlaylists);
 
         viewPager.setOffscreenPageLimit(2);
-
         viewPager.setAdapter(
                 new ViewPagerAdapter(getSupportFragmentManager(),
                 getLifecycle())
         );
-
         new TabLayoutMediator(findViewById(R.id.main_screen_tab_layout),
                 viewPager,
                 false,
@@ -114,7 +106,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    @SuppressLint("Range")
     @NeedsPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
     void getSongs() {
         ContentResolver contentResolver = this.getContentResolver();
@@ -130,12 +121,12 @@ public class MainActivity extends AppCompatActivity {
         cursor.moveToFirst();
 
         do {
-            System.out.println("id " + cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media._ID)));
-            System.out.println("title " + cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)));
-            System.out.println("artist " + cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)));
-            System.out.println("data " + cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA)));
-            System.out.println("date added " + cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATE_ADDED)));
-            System.out.println("album id " + cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID)));
+            System.out.println("id " + cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)));
+            System.out.println("title " + cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)));
+            System.out.println("artist " + cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)));
+            System.out.println("data " + cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)));
+            System.out.println("date added " + cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_ADDED)));
+            System.out.println("album id " + cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID)));
         } while (cursor.moveToNext());
 
         cursor.close();

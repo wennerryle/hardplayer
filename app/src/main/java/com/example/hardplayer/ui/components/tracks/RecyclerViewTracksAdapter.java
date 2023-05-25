@@ -1,27 +1,38 @@
 package com.example.hardplayer.ui.components.tracks;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.AsyncListDiffer;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hardplayer.R;
 import com.example.hardplayer.models.Track;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class RecyclerViewTracksAdapter extends RecyclerView.Adapter<TracksHolder> {
-    private ArrayList<Track> tracks = new ArrayList<>();
+
+    private final AsyncListDiffer<Track> differ = new AsyncListDiffer<>(this, new DiffUtil.ItemCallback<Track>() {
+        @Override
+        public boolean areItemsTheSame(@NonNull Track oldItem, @NonNull Track newItem) {
+            return oldItem.getId() == newItem.getId();
+        }
+
+        @SuppressLint("DiffUtilEquals")
+        @Override
+        public boolean areContentsTheSame(@NonNull Track oldItem, @NonNull Track newItem) {
+            return oldItem.equals(newItem);
+        }
+    });
 
     public void setTracks(ArrayList<Track> tracks) {
-        this.tracks = tracks;
-        this.notifyDataSetChanged();
-    }
-
-    public RecyclerViewTracksAdapter(ArrayList<Track> tracks) {
-        this.tracks = tracks;
+        differ.submitList(tracks);
     }
 
     @NonNull
@@ -33,7 +44,7 @@ public class RecyclerViewTracksAdapter extends RecyclerView.Adapter<TracksHolder
 
     @Override
     public void onBindViewHolder(@NonNull TracksHolder holder, int position) {
-        Track currentTrack = tracks.get(position);
+        Track currentTrack = differ.getCurrentList().get(position);
 
         holder.trackName.setText(currentTrack.getName());
         holder.trackAuthors.setText(currentTrack.getAuthor());
@@ -45,6 +56,6 @@ public class RecyclerViewTracksAdapter extends RecyclerView.Adapter<TracksHolder
 
     @Override
     public int getItemCount() {
-        return tracks.size();
+        return differ.getCurrentList().size();
     }
 }

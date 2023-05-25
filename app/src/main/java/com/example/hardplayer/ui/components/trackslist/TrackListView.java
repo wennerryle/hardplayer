@@ -17,15 +17,15 @@ import com.example.hardplayer.ui.components.tracks.RecyclerViewTracksAdapter;
 import java.util.ArrayList;
 
 public class TrackListView extends LinearLayout {
-    ArrayList<Track> tracks = new ArrayList<>();
+    ArrayList<Track> tracks;
     private RecyclerView recyclerView;
     private TextView warningTextView;
     public RecyclerViewTracksAdapter recyclerViewTracksAdapter;
 
     public TrackListView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-
         setOrientation(LinearLayout.VERTICAL);
+        tracks = new ArrayList<>();
 
         LayoutInflater inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -37,7 +37,7 @@ public class TrackListView extends LinearLayout {
         recyclerView = (RecyclerView) getChildAt(0);
         warningTextView = (TextView) getChildAt(1);
 
-        recyclerViewTracksAdapter = new RecyclerViewTracksAdapter(tracks);
+        recyclerViewTracksAdapter = new RecyclerViewTracksAdapter();
 
         recyclerView.setAdapter(recyclerViewTracksAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -47,7 +47,7 @@ public class TrackListView extends LinearLayout {
     }
 
     private void checkCountsTrack() {
-        if(tracks.size() == 0)
+        if(tracks == null || tracks.isEmpty())
             warningTextView.setVisibility(VISIBLE);
         else
             warningTextView.setVisibility(GONE);
