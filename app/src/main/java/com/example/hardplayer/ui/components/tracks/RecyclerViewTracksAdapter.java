@@ -6,10 +6,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.AsyncListDiffer;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.hardplayer.R;
 import com.example.hardplayer.models.Track;
 
@@ -49,8 +51,12 @@ public class RecyclerViewTracksAdapter extends RecyclerView.Adapter<TracksHolder
         holder.trackAuthors.setText(currentTrack.getArtists());
         holder.trackFavorite.setChecked(currentTrack.getIsFavorite());
 
-        // TODO: Change this background to a real
-        holder.trackImage.setImageResource(R.drawable.basic_background);
+        Glide
+                .with(holder.trackImage)
+                .load(currentTrack.getAlbumImage())
+                .centerCrop()
+                .placeholder(R.drawable.placeholder)
+                .into(holder.trackImage);
     }
 
     @Override

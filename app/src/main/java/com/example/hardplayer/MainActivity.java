@@ -12,6 +12,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import android.Manifest;
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -129,7 +130,12 @@ public class MainActivity extends AppCompatActivity {
             String trackArtists = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST));
             String trackLocation = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA));
 
-            tracks.add(new Track(trackID, albumID, trackTitle, trackArtists, trackLocation));
+            Uri album_uri = ContentUris.withAppendedId(
+                    Uri.parse("content://media/external/audio/albumart"),
+                    albumID
+            );
+
+            tracks.add(new Track(trackID, albumID, trackTitle, trackArtists, trackLocation, album_uri));
         } while (cursor.moveToNext());
 
         vm.setTracks(tracks);

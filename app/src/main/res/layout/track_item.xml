@@ -2,6 +2,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="60dp"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <com.google.android.material.imageview.ShapeableImageView
@@ -18,7 +20,9 @@
 
     <TextView
         android:id="@+id/track_item_name"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
+        android:paddingLeft="75dp"
+        android:paddingRight="65dp"
         android:layout_height="wrap_content"
         android:maxLines="1"
         android:ellipsize="end"
