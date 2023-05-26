@@ -27,10 +27,13 @@ import android.widget.Toast;
 import com.example.hardplayer.models.Playlist;
 import com.example.hardplayer.ui.components.playlistcarousel.RecycleViewPlaylistAdapter;
 import com.example.hardplayer.ui.components.viewpager.ViewPagerAdapter;
+import com.example.hardplayer.ui.fragments.AllTracksFragment;
+import com.example.hardplayer.ui.fragments.FavoriteTracksFragment;
 import com.example.hardplayer.utils.SharedThreads;
 import com.google.android.material.tabs.TabLayoutMediator;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import og.android.lib.toggleiconview.ToggleIconView;
@@ -71,17 +74,18 @@ public class MainActivity extends AppCompatActivity {
         adapterPlaylists.setPlaylists(vm.playlists);
         playlistsRV.setAdapter(adapterPlaylists);
 
-
         viewPager.setOffscreenPageLimit(2);
         viewPager.setAdapter(
                 new ViewPagerAdapter(getSupportFragmentManager(),
-                getLifecycle())
+                getLifecycle(), List.of(new AllTracksFragment(), new FavoriteTracksFragment()))
         );
+
+        String[] tabTexts = new String[] {"Избранные", "Все"};
         new TabLayoutMediator(findViewById(R.id.main_screen_tab_layout),
                 viewPager,
                 false,
                 true,
-                ((tab, position) -> tab.setText(position == 0 ? "Избранные" : "Все" ))
+                ((tab, position) -> tab.setText(tabTexts[position]))
         ).attach();
 
         findViewById(R.id.player_play_button).setOnClickListener(button -> {
