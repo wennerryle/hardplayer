@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.hardplayer.R;
 
 public class TracksHolder extends RecyclerView.ViewHolder {
+    View itemView;
     TextView trackName;
     TextView trackAuthors;
     ImageView trackImage;
@@ -18,10 +19,10 @@ public class TracksHolder extends RecyclerView.ViewHolder {
     
     public TracksHolder(@NonNull View itemView) {
         super(itemView);
-        
-        trackName = itemView.findViewById(R.id.track_item_name);
-        trackAuthors = itemView.findViewById(R.id.track_item_authors);
-        trackImage = itemView.findViewById(R.id.track_item_album_image);
-        trackFavorite = itemView.findViewById(R.id.track_item_favorite_checkbox);
+        this.itemView = itemView;
+        this.trackName = itemView.findViewById(R.id.track_item_name);
+        this.trackAuthors = itemView.findViewById(R.id.track_item_authors);
+        this.trackImage = itemView.findViewById(R.id.track_item_album_image);
+        this.trackFavorite = itemView.findViewById(R.id.track_item_favorite_checkbox);
     }
 }

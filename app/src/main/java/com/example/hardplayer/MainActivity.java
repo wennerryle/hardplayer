@@ -1,5 +1,7 @@
 package com.example.hardplayer;
 
+import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,6 +16,7 @@ import android.Manifest;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -21,9 +24,11 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.hardplayer.models.Track;
 import com.example.hardplayer.ui.components.playlistcarousel.RecycleViewPlaylistAdapter;
 import com.example.hardplayer.ui.components.viewpager.ViewPagerAdapter;
@@ -49,18 +54,31 @@ public class MainActivity extends AppCompatActivity {
     private CheckBox favoriteCheckbox;
     private ViewPager2 viewPager;
     private TextView backTimerCollapsed;
+    private ImageView playingTrackBackground;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        vm = new ViewModelProvider(this).get(MainViewModel.class);
-
         // init components
         favoriteCheckbox = findViewById(R.id.player_favorite_checkbox);
         viewPager = findViewById(R.id.main_screen_viewpager);
         backTimerCollapsed = findViewById(R.id.player_back_timer_collapsed);
+        playingTrackBackground = findViewById(R.id.player_back_background);
+
+        vm = new ViewModelProvider(this).get(MainViewModel.class);
+
+        vm.currentTrack.observe(this, track -> {
+            Glide
+                    .with(this)
+                    .load(track.getAlbumImage())
+                    .placeholder(R.drawable.placeholder)
+                    .override(Resources.getSystem().getDisplayMetrics().widthPixels + 40,
+                            Resources.getSystem().getDisplayMetrics().heightPixels + 40)
+                    .transition(withCrossFade())
+                    .into(playingTrackBackground);
+        });
 
         RecyclerView playlistsRV = findViewById(R.id.main_screen_recycler_view_playlists);
         playlistsRV.setLayoutManager(
@@ -77,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
                 getLifecycle(), List.of(new AllTracksFragment(), new FavoriteTracksFragment()))
         );
 
-        String[] tabTexts = new String[] {"Избранные", "Все"};
+        String[] tabTexts = new String[] {"Все", "Избранные"};
         new TabLayoutMediator(findViewById(R.id.main_screen_tab_layout),
                 viewPager,
                 false,

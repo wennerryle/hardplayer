@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.AsyncListDiffer;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,6 +17,7 @@ import com.example.hardplayer.models.Track;
 import java.util.ArrayList;
 
 public class RecyclerViewTracksAdapter extends RecyclerView.Adapter<TracksHolder> {
+    private OnItemClickListener onClickListener;
 
     private final AsyncListDiffer<Track> differ = new AsyncListDiffer<>(this, new DiffUtil.ItemCallback<Track>() {
         @Override
@@ -32,8 +32,18 @@ public class RecyclerViewTracksAdapter extends RecyclerView.Adapter<TracksHolder
         }
     });
 
+    public RecyclerViewTracksAdapter(OnItemClickListener onClickListener) {
+        this.onClickListener = onClickListener;
+    }
+
+    public RecyclerViewTracksAdapter() {}
+
     public void setTracks(ArrayList<Track> tracks) {
         differ.submitList(tracks);
+    }
+
+    public void setOnClickListener(OnItemClickListener onClickListener) {
+        this.onClickListener = onClickListener;
     }
 
     @NonNull
@@ -57,6 +67,10 @@ public class RecyclerViewTracksAdapter extends RecyclerView.Adapter<TracksHolder
                 .centerCrop()
                 .placeholder(R.drawable.placeholder)
                 .into(holder.trackImage);
+
+        holder.itemView.setOnClickListener(view -> {
+            onClickListener.onItemClick(view, position);
+        });
     }
 
     @Override
