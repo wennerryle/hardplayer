@@ -14,4 +14,8 @@ public class MainViewModel extends ViewModel {
 
     private MutableLiveData<ArrayList<Track>> mutableTracks = new MutableLiveData<>();
     public LiveData<ArrayList<Track>> tracks = mutableTracks;
+
+    public void setTracks(ArrayList<Track> tracks) {
+        mutableTracks.postValue(tracks);
+    }
 }

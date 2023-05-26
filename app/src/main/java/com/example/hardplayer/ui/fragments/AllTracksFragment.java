@@ -2,6 +2,8 @@ package com.example.hardplayer.ui.fragments;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -21,7 +23,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class AllTracksFragment extends Fragment {
     private MainViewModel vm;
-
+    private TrackListView trackListView;
     public AllTracksFragment() {
         // Required empty public constructor
     }
@@ -29,19 +31,22 @@ public class AllTracksFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        vm = new ViewModelProvider(this).get(MainViewModel.class);
+        vm = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
 
         View view = inflater.inflate(R.layout.fragment_favorite_tracks, container, false);
-
-        TrackListView trackListView = view.findViewById(R.id.favorite_tracks_view);
+        trackListView = view.findViewById(R.id.favorite_tracks_view);
 
         ArrayList<Track> tracksData = vm.tracks.getValue();
 
+        trackListView.setTracks(tracksData);
+        return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         vm.tracks.observe(getViewLifecycleOwner(), (newTracks) -> {
             trackListView.setTracks(newTracks);
         });
-
-        trackListView.setTracks(tracksData);
-        return view;
     }
 }

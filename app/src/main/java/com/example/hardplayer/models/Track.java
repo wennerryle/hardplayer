@@ -2,29 +2,39 @@ package com.example.hardplayer.models;
 
 public class Track {
     long id;
-    Playlist playlist;
-    String name;
-    String author;
+    long albumID;
+    String title;
+    String trackLocation;
+    String artists;
     Boolean isFavorite;
 
-    public Track(long id, Playlist playlist, String name, String author, Boolean isFavorite) {
+    public Track(long id, long albumID, String title, String artists, String trackLocation, Boolean isFavorite) {
         this.id = id;
-        this.playlist = playlist;
-        this.name = name;
-        this.author = author;
+        this.albumID = albumID;
+        this.title = title;
+        this.artists = artists;
         this.isFavorite = isFavorite;
     }
 
-    public Playlist getPlaylist() {
-        return playlist;
+    public Track(long id, long albumID, String title, String artists, String trackLocation) {
+        this.id = id;
+        this.albumID = albumID;
+        this.title = title;
+        this.artists = artists;
+        this.trackLocation = trackLocation;
+        this.isFavorite = false;
     }
 
-    public String getName() {
-        return name;
+    public long getAlbumID() {
+        return albumID;
     }
 
-    public String getAuthor() {
-        return author;
+    public String getTitle() {
+        return title;
+    }
+
+    public String getArtists() {
+        return artists;
     }
 
     public boolean getIsFavorite() {

@@ -14,7 +14,6 @@ import com.example.hardplayer.R;
 import com.example.hardplayer.models.Track;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class RecyclerViewTracksAdapter extends RecyclerView.Adapter<TracksHolder> {
 
@@ -46,8 +45,8 @@ public class RecyclerViewTracksAdapter extends RecyclerView.Adapter<TracksHolder
     public void onBindViewHolder(@NonNull TracksHolder holder, int position) {
         Track currentTrack = differ.getCurrentList().get(position);
 
-        holder.trackName.setText(currentTrack.getName());
-        holder.trackAuthors.setText(currentTrack.getAuthor());
+        holder.trackName.setText(currentTrack.getTitle());
+        holder.trackAuthors.setText(currentTrack.getArtists());
         holder.trackFavorite.setChecked(currentTrack.getIsFavorite());
 
         // TODO: Change this background to a real
