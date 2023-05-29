@@ -6,19 +6,43 @@ public class Track {
     long id;
     long albumID;
     String title;
-    String trackLocation;
+    Uri trackLocation;
     String artists;
-    Boolean isFavorite;
     Uri albumImage;
+    int duration;
+    int size;
+    boolean isFavorite;
 
-    public Track(long id, long albumID, String title, String artists, String trackLocation, Uri albumImage) {
+    public int getDuration() {
+        return duration;
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    public boolean isFavorite() {
+        return isFavorite;
+    }
+
+    public Track(long id, long albumID, String title, Uri trackLocation, String artists, Boolean isFavorite, Uri albumImage, int duration, int size) {
         this.id = id;
         this.albumID = albumID;
         this.title = title;
-        this.artists = artists;
         this.trackLocation = trackLocation;
-        this.isFavorite = false;
+        this.artists = artists;
+        this.isFavorite = isFavorite;
         this.albumImage = albumImage;
+        this.duration = duration;
+        this.size = size;
+    }
+
+    public Uri getTrackLocation() {
+        return trackLocation;
+    }
+
+    public Boolean getFavorite() {
+        return isFavorite;
     }
 
     public Uri getAlbumImage() {

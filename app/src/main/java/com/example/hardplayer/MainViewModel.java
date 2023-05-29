@@ -1,19 +1,26 @@
 package com.example.hardplayer;
 
+import android.content.Context;
+import android.media.MediaPlayer;
+
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.hardplayer.mediaplayer.SharedMediaPlayer;
 import com.example.hardplayer.models.Playlist;
 import com.example.hardplayer.models.Track;
 
 import java.util.ArrayList;
 
 public class MainViewModel extends ViewModel {
+    private static MediaPlayer mediaPlayer = SharedMediaPlayer.getInstance();
+
     public ArrayList<Playlist> playlists = new ArrayList<>();
 
-    private MutableLiveData<Integer> mutableCurrentTrackTime = new MutableLiveData<Integer>();
-    public LiveData<Integer> currentTrackTime = mutableCurrentTrackTime;
+    private MutableLiveData<Integer> mutableCurrentTrackTimeInMs = new MutableLiveData<Integer>();
+    public LiveData<Integer> currentTrackTimeInMs = mutableCurrentTrackTimeInMs;
 
     private MutableLiveData<Boolean> mutableIsPlaying = new MutableLiveData<>();
     public LiveData<Boolean> isPlaying = new MutableLiveData<>();
@@ -24,18 +31,19 @@ public class MainViewModel extends ViewModel {
     private MutableLiveData<Track> mutableCurrentTrack = new MutableLiveData<>();
     public LiveData<Track> currentTrack = mutableCurrentTrack;
 
+    public void toggleIsPlaying() {
+        mutableIsPlaying.postValue(!isPlaying.getValue());
+    }
+
     public void setTracks(ArrayList<Track> tracks) {
         mutableTracks.postValue(tracks);
     }
 
-    public void setCurrentTrack(Track currentTrack) {
+    public void setCurrentTrack(@NonNull Context context, Track currentTrack) {
         mutableCurrentTrack.postValue(currentTrack);
     }
 
-    public void setCurrentTrackByID(long ID) {
-        tracks.getValue().forEach(track -> {
-            if(track.getId() == ID)
-                mutableCurrentTrack.postValue(track);
-        });
+    public void setCurrentTrackTimeInMs(int time) {
+        mutableCurrentTrackTimeInMs.postValue(time);
     }
 }

@@ -41,7 +41,7 @@ public class AllTracksFragment extends Fragment {
         trackListView.setOnClickListener((view1, position) -> {
             Track selectedTrack = trackListView.getTracks().get(position);
 
-            vm.setCurrentTrack(selectedTrack);
+            vm.setCurrentTrack(getContext(), selectedTrack);
         });
 
         return view;

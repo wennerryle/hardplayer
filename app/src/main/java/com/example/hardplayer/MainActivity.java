@@ -18,22 +18,27 @@ import android.content.ContentUris;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.view.View;
-import android.widget.CheckBox;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.hardplayer.databinding.ActivityMainBinding;
+import com.example.hardplayer.mediaplayer.SharedMediaPlayer;
 import com.example.hardplayer.models.Track;
+import com.example.hardplayer.models.TrackBuilder;
 import com.example.hardplayer.ui.components.playlistcarousel.RecycleViewPlaylistAdapter;
 import com.example.hardplayer.ui.components.viewpager.ViewPagerAdapter;
 import com.example.hardplayer.ui.fragments.AllTracksFragment;
 import com.example.hardplayer.ui.fragments.FavoriteTracksFragment;
+import com.example.hardplayer.utils.TimeFormatter;
+import com.google.android.material.slider.Slider;
 import com.google.android.material.tabs.TabLayoutMediator;
 
 import java.util.ArrayList;
@@ -51,33 +56,89 @@ import permissions.dispatcher.RuntimePermissions;
 @RuntimePermissions
 public class MainActivity extends AppCompatActivity {
     private MainViewModel vm;
-    private CheckBox favoriteCheckbox;
-    private ViewPager2 viewPager;
-    private TextView backTimerCollapsed;
-    private ImageView playingTrackBackground;
+
+    private ActivityMainBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        View view = binding.getRoot();
+        setContentView(view);
 
         // init components
-        favoriteCheckbox = findViewById(R.id.player_favorite_checkbox);
-        viewPager = findViewById(R.id.main_screen_viewpager);
-        backTimerCollapsed = findViewById(R.id.player_back_timer_collapsed);
-        playingTrackBackground = findViewById(R.id.player_back_background);
+        ViewPager2 viewPager = findViewById(R.id.main_screen_viewpager);
 
         vm = new ViewModelProvider(this).get(MainViewModel.class);
+
+        Handler tracksDataHandler = new Handler(Looper.getMainLooper());
+        Runnable onSecondHandler = new Runnable() {
+            @Override
+            public void run() {
+                binding.playerSlider.setValue(SharedMediaPlayer.getInstance().getCurrentPosition());
+                binding.playerBackTimerCollapsed.setText(TimeFormatter.formatMilliseconds(
+                        vm.currentTrack.getValue().getDuration() - SharedMediaPlayer.getInstance().getCurrentPosition()
+                ));
+                tracksDataHandler.postDelayed(this, 1000);
+            }
+        };
 
         vm.currentTrack.observe(this, track -> {
             Glide
                     .with(this)
                     .load(track.getAlbumImage())
-                    .placeholder(R.drawable.placeholder)
-                    .override(Resources.getSystem().getDisplayMetrics().widthPixels + 40,
-                            Resources.getSystem().getDisplayMetrics().heightPixels + 40)
+                    .override(Resources.getSystem().getDisplayMetrics().widthPixels,
+                                Resources.getSystem().getDisplayMetrics().heightPixels)
                     .transition(withCrossFade())
-                    .into(playingTrackBackground);
+                    .placeholder(R.drawable.placeholder)
+                    .into(binding.playerBackBackground);
+
+            binding.playerTrackName.setText(track.getTitle());
+            binding.playerTrackAuthor.setText(track.getArtists());
+            binding.playerFavoriteCheckbox.setActivated(track.getIsFavorite());
+
+            //ура мешаем бизнес логику и отображение, оторвать бы себе руки
+
+            SharedMediaPlayer.getInstance().stop();
+            SharedMediaPlayer.getInstance().release(); // free memory
+            SharedMediaPlayer.setMediaPlayer(
+                    MediaPlayer.create(this, track.getTrackLocation())
+            ); // prepare track
+            SharedMediaPlayer.getInstance().start();
+
+            binding.playerTrackTime.setText(TimeFormatter.formatMilliseconds(
+                    track.getDuration()
+            ));
+
+            binding.playerSlider.setValueTo(track.getDuration());
+            binding.playerSlider.setValue(0);
+            tracksDataHandler.post(onSecondHandler);
+        });
+
+        vm.currentTrackTimeInMs.observe(this, trackInMS -> {
+            String formattedTime = TimeFormatter.formatMilliseconds(trackInMS);
+
+            binding.playerBackTimerExpanded.setText(formattedTime);
+            binding.playerBackTimerCollapsed.setText(formattedTime);
+            binding.playerSeekbarTimer.setText(formattedTime);
+        });
+
+        binding.playerSlider.addOnSliderTouchListener(new Slider.OnSliderTouchListener() {
+            @Override
+            public void onStartTrackingTouch(@NonNull Slider slider) {
+                binding.playerSeekbarTimerFramelayout.animate().alpha(1f);
+            }
+
+            @Override
+            public void onStopTrackingTouch(@NonNull Slider slider) {
+                binding.playerSeekbarTimerFramelayout.animate().alpha(0f);
+            }
+        });
+
+        binding.playerSlider.addOnChangeListener((slider, value, fromUser) -> {
+            vm.setCurrentTrackTimeInMs((int) value);
+            if (fromUser)
+                SharedMediaPlayer.getInstance().seekTo((int) value);
         });
 
         RecyclerView playlistsRV = findViewById(R.id.main_screen_recycler_view_playlists);
@@ -105,19 +166,21 @@ public class MainActivity extends AppCompatActivity {
 
         findViewById(R.id.player_play_button).setOnClickListener(button -> {
             ((ToggleIconView) button.findViewById(R.id.avd_play_and_stop)).toggle();
+
+            System.out.println("hello world!");
         });
 
         ((MotionLayout) findViewById(R.id.player_background)).setTransitionListener(new TransitionAdapter() {
             @Override
             public void onTransitionChange(MotionLayout motionLayout, int startId, int endId, float progress) {
-                backTimerCollapsed.post(() -> {
-                    favoriteCheckbox.setAlpha(progress * 2);
-                    backTimerCollapsed.setAlpha(1 - progress * 6);
+                binding.playerBackTimerCollapsed.post(() -> {
+                    binding.playerFavoriteCheckbox.setAlpha(progress * 2);
+                    binding.playerBackTimerCollapsed.setAlpha(1 - progress * 6);
 
                     if (progress < 0.1f)
-                        favoriteCheckbox.setVisibility(View.GONE);
+                        binding.playerFavoriteCheckbox.setVisibility(View.GONE);
                     else
-                        favoriteCheckbox.setVisibility(View.VISIBLE);
+                        binding.playerFavoriteCheckbox.setVisibility(View.VISIBLE);
                 });
             }
         });
@@ -138,22 +201,37 @@ public class MainActivity extends AppCompatActivity {
                 null);
 
         if (cursor == null) return;
-
-        cursor.moveToFirst();
+        if(!cursor.moveToFirst()) return;
 
         do {
             long trackID = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID));
             long albumID = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID));
             String trackTitle = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE));
             String trackArtists = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST));
-            String trackLocation = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA));
+            int size = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE));
+            int duration = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION));
+
+            Uri trackLocation = ContentUris.withAppendedId(
+                    MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, trackID
+            );
 
             Uri album_uri = ContentUris.withAppendedId(
                     Uri.parse("content://media/external/audio/albumart"),
                     albumID
             );
 
-            tracks.add(new Track(trackID, albumID, trackTitle, trackArtists, trackLocation, album_uri));
+            tracks.add(TrackBuilder
+                    .aTrack()
+                    .withId(trackID)
+                    .withAlbumID(albumID)
+                    .withTitle(trackTitle)
+                    .withArtists(trackArtists)
+                    .withTrackLocation(trackLocation)
+                    .withAlbumImage(album_uri)
+                    .withSize(size)
+                    .withDuration(duration)
+                    .build()
+            );
         } while (cursor.moveToNext());
 
         vm.setTracks(tracks);
