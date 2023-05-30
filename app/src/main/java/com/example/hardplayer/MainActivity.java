@@ -43,6 +43,9 @@ import com.google.android.material.tabs.TabLayoutMediator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 import og.android.lib.toggleiconview.ToggleIconView;
 
@@ -75,10 +78,18 @@ public class MainActivity extends AppCompatActivity {
         Runnable onSecondHandler = new Runnable() {
             @Override
             public void run() {
-                binding.playerSlider.setValue(SharedMediaPlayer.getInstance().getCurrentPosition());
+                int currentDurationPosition = SharedMediaPlayer.getInstance().getCurrentPosition();
+
+                // because https://stackoverflow.com/questions/31706191/android-method-getduration-of-mediaplayer-returns-wrong-value
+                if (currentDurationPosition < binding.playerSlider.getValue())
+                    binding.playerSlider.setValue(currentDurationPosition);
+
                 binding.playerBackTimerCollapsed.setText(TimeFormatter.formatMilliseconds(
                         vm.currentTrack.getValue().getDuration() - SharedMediaPlayer.getInstance().getCurrentPosition()
                 ));
+                binding.playerBackTimerExpanded.setText(
+                        TimeFormatter.formatMilliseconds((int) SharedMediaPlayer.getInstance().getCurrentPosition())
+                );
                 tracksDataHandler.postDelayed(this, 1000);
             }
         };
@@ -87,8 +98,10 @@ public class MainActivity extends AppCompatActivity {
             Glide
                     .with(this)
                     .load(track.getAlbumImage())
-                    .override(Resources.getSystem().getDisplayMetrics().widthPixels,
-                                Resources.getSystem().getDisplayMetrics().heightPixels)
+                    .override(
+                            Resources.getSystem().getDisplayMetrics().widthPixels,
+                            Resources.getSystem().getDisplayMetrics().heightPixels
+                    )
                     .transition(withCrossFade())
                     .placeholder(R.drawable.placeholder)
                     .into(binding.playerBackBackground);
@@ -106,40 +119,63 @@ public class MainActivity extends AppCompatActivity {
             ); // prepare track
             SharedMediaPlayer.getInstance().start();
 
+            // https://stackoverflow.com/questions/17229041/mediaplayer-oncompletion-is-not-being-called-accurately
+            SharedMediaPlayer.getInstance().setOnCompletionListener(mediaPlayer -> {
+                Track currentTrack = TrackQueueManager.getAndSwitchToNextTrack();
+
+                if (null != currentTrack) {
+                    vm.setCurrentTrack(this, currentTrack);
+                }
+            });
+
             binding.playerTrackTime.setText(TimeFormatter.formatMilliseconds(
                     track.getDuration()
             ));
 
-            binding.playerSlider.setValueTo(track.getDuration());
+            binding.avdPlayAndStop.setChecked(true);
+            binding.playerSlider.setValueTo(SharedMediaPlayer.getInstance().getDuration());
             binding.playerSlider.setValue(0);
             tracksDataHandler.post(onSecondHandler);
-        });
-
-        vm.currentTrackTimeInMs.observe(this, trackInMS -> {
-            String formattedTime = TimeFormatter.formatMilliseconds(trackInMS);
-
-            binding.playerBackTimerExpanded.setText(formattedTime);
-            binding.playerBackTimerCollapsed.setText(formattedTime);
-            binding.playerSeekbarTimer.setText(formattedTime);
         });
 
         binding.playerSlider.addOnSliderTouchListener(new Slider.OnSliderTouchListener() {
             @Override
             public void onStartTrackingTouch(@NonNull Slider slider) {
                 binding.playerSeekbarTimerFramelayout.animate().alpha(1f);
+                SharedMediaPlayer.getInstance().pause();
             }
 
             @Override
             public void onStopTrackingTouch(@NonNull Slider slider) {
                 binding.playerSeekbarTimerFramelayout.animate().alpha(0f);
+                if (binding.avdPlayAndStop.isChecked())
+                    SharedMediaPlayer.getInstance().start();
             }
         });
 
         binding.playerSlider.addOnChangeListener((slider, value, fromUser) -> {
-            vm.setCurrentTrackTimeInMs((int) value);
-            if (fromUser)
+            if (fromUser) {
                 SharedMediaPlayer.getInstance().seekTo((int) value);
+                String formattedTime = TimeFormatter.formatMilliseconds((int) value);
+                binding.playerBackTimerExpanded.setText(formattedTime);
+                binding.playerSeekbarTimer.setText(formattedTime);
+            }
         });
+
+        binding.playerNextTrackButton.setOnClickListener(btn -> {
+            Track nextTrack = TrackQueueManager.getAndSwitchToNextTrack();
+
+            if (null != nextTrack)
+                vm.setCurrentTrack(this, nextTrack);
+        });
+
+        binding.playerPreviousTrackButton.setOnClickListener(btn -> {
+            Track nextTrack = TrackQueueManager.getAndSwitchToPreviousTrack();
+
+            if (null != nextTrack)
+                vm.setCurrentTrack(this, nextTrack);
+        });
+
 
         RecyclerView playlistsRV = findViewById(R.id.main_screen_recycler_view_playlists);
         playlistsRV.setLayoutManager(
@@ -165,9 +201,13 @@ public class MainActivity extends AppCompatActivity {
         ).attach();
 
         findViewById(R.id.player_play_button).setOnClickListener(button -> {
-            ((ToggleIconView) button.findViewById(R.id.avd_play_and_stop)).toggle();
-
-            System.out.println("hello world!");
+            if(SharedMediaPlayer.getInstance().isPlaying()){
+                binding.avdPlayAndStop.setChecked(false);
+                SharedMediaPlayer.getInstance().pause();
+            } else {
+                binding.avdPlayAndStop.setChecked(true);
+                SharedMediaPlayer.getInstance().start();
+            }
         });
 
         ((MotionLayout) findViewById(R.id.player_background)).setTransitionListener(new TransitionAdapter() {

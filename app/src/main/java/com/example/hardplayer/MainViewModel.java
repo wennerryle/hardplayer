@@ -19,21 +19,11 @@ public class MainViewModel extends ViewModel {
 
     public ArrayList<Playlist> playlists = new ArrayList<>();
 
-    private MutableLiveData<Integer> mutableCurrentTrackTimeInMs = new MutableLiveData<Integer>();
-    public LiveData<Integer> currentTrackTimeInMs = mutableCurrentTrackTimeInMs;
-
-    private MutableLiveData<Boolean> mutableIsPlaying = new MutableLiveData<>();
-    public LiveData<Boolean> isPlaying = new MutableLiveData<>();
-
     private MutableLiveData<ArrayList<Track>> mutableTracks = new MutableLiveData<>();
     public LiveData<ArrayList<Track>> tracks = mutableTracks;
 
     private MutableLiveData<Track> mutableCurrentTrack = new MutableLiveData<>();
     public LiveData<Track> currentTrack = mutableCurrentTrack;
-
-    public void toggleIsPlaying() {
-        mutableIsPlaying.postValue(!isPlaying.getValue());
-    }
 
     public void setTracks(ArrayList<Track> tracks) {
         mutableTracks.postValue(tracks);
@@ -41,9 +31,5 @@ public class MainViewModel extends ViewModel {
 
     public void setCurrentTrack(@NonNull Context context, Track currentTrack) {
         mutableCurrentTrack.postValue(currentTrack);
-    }
-
-    public void setCurrentTrackTimeInMs(int time) {
-        mutableCurrentTrackTimeInMs.postValue(time);
     }
 }

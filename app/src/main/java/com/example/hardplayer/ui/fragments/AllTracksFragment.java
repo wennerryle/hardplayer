@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 
 import com.example.hardplayer.MainViewModel;
 import com.example.hardplayer.R;
+import com.example.hardplayer.TrackQueueManager;
 import com.example.hardplayer.models.Track;
 import com.example.hardplayer.ui.components.tracks.OnItemClickListener;
 import com.example.hardplayer.ui.components.trackslistview.TrackListView;
@@ -40,7 +41,7 @@ public class AllTracksFragment extends Fragment {
 
         trackListView.setOnClickListener((view1, position) -> {
             Track selectedTrack = trackListView.getTracks().get(position);
-
+            TrackQueueManager.setTracksQueue(vm.tracks.getValue(), position);
             vm.setCurrentTrack(getContext(), selectedTrack);
         });
 
