@@ -1,31 +1,71 @@
 package com.example.hardplayer.models;
 
+import android.net.Uri;
+
 public class Track {
-    Playlist playlist;
-    String name;
-    String author;
-    Boolean isFavorite;
+    long id;
+    long albumID;
+    String title;
+    Uri trackLocation;
+    String artists;
+    Uri albumImage;
+    int duration;
+    int size;
+    boolean isFavorite;
 
-    public Track(Playlist playlist, String name, String author, Boolean isFavorite) {
-        this.playlist = playlist;
-        this.name = name;
-        this.author = author;
+    public int getDuration() {
+        return duration;
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    public boolean isFavorite() {
+        return isFavorite;
+    }
+
+    public Track(long id, long albumID, String title, Uri trackLocation, String artists, Boolean isFavorite, Uri albumImage, int duration, int size) {
+        this.id = id;
+        this.albumID = albumID;
+        this.title = title;
+        this.trackLocation = trackLocation;
+        this.artists = artists;
         this.isFavorite = isFavorite;
+        this.albumImage = albumImage;
+        this.duration = duration;
+        this.size = size;
     }
 
-    public Playlist getPlaylist() {
-        return playlist;
+    public Uri getTrackLocation() {
+        return trackLocation;
     }
 
-    public String getName() {
-        return name;
+    public Boolean getFavorite() {
+        return isFavorite;
     }
 
-    public String getAuthor() {
-        return author;
+    public Uri getAlbumImage() {
+        return albumImage;
+    }
+
+    public long getAlbumID() {
+        return albumID;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getArtists() {
+        return artists;
     }
 
     public boolean getIsFavorite() {
         return isFavorite;
+    }
+
+    public long getId() {
+        return id;
     }
 }

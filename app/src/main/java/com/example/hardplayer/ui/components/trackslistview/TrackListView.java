@@ -1,4 +1,4 @@
-package com.example.hardplayer.ui.components.trackslist;
+package com.example.hardplayer.ui.components.trackslistview;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -12,20 +12,24 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hardplayer.R;
 import com.example.hardplayer.models.Track;
+import com.example.hardplayer.ui.components.tracks.OnItemClickListener;
 import com.example.hardplayer.ui.components.tracks.RecyclerViewTracksAdapter;
 
 import java.util.ArrayList;
 
 public class TrackListView extends LinearLayout {
-    ArrayList<Track> tracks = new ArrayList<>();
-    private RecyclerView recyclerView;
+    private ArrayList<Track> tracks;
     private TextView warningTextView;
     public RecyclerViewTracksAdapter recyclerViewTracksAdapter;
 
+    public ArrayList<Track> getTracks() {
+        return tracks;
+    }
+
     public TrackListView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-
         setOrientation(LinearLayout.VERTICAL);
+        tracks = new ArrayList<>();
 
         LayoutInflater inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -34,10 +38,10 @@ public class TrackListView extends LinearLayout {
         // see https://developer.alexanderklimov.ru/android/theory/layoutinflater.php
         inflater.inflate(R.layout.view_trackslist, this, true);
 
-        recyclerView = (RecyclerView) getChildAt(0);
+        RecyclerView recyclerView = (RecyclerView) getChildAt(0);
         warningTextView = (TextView) getChildAt(1);
 
-        recyclerViewTracksAdapter = new RecyclerViewTracksAdapter(tracks);
+        recyclerViewTracksAdapter = new RecyclerViewTracksAdapter();
 
         recyclerView.setAdapter(recyclerViewTracksAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -47,7 +51,7 @@ public class TrackListView extends LinearLayout {
     }
 
     private void checkCountsTrack() {
-        if(tracks.size() == 0)
+        if(tracks == null || tracks.isEmpty())
             warningTextView.setVisibility(VISIBLE);
         else
             warningTextView.setVisibility(GONE);
@@ -61,5 +65,9 @@ public class TrackListView extends LinearLayout {
         this.tracks = tracks;
         recyclerViewTracksAdapter.setTracks(this.tracks);
         checkCountsTrack();
+    }
+
+    public void setOnClickListener(OnItemClickListener onItemClickListener) {
+        recyclerViewTracksAdapter.setOnClickListener(onItemClickListener);
     }
 }

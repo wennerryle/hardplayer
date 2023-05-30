@@ -1,27 +1,49 @@
 package com.example.hardplayer.ui.components.tracks;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.AsyncListDiffer;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.hardplayer.R;
 import com.example.hardplayer.models.Track;
 
 import java.util.ArrayList;
 
 public class RecyclerViewTracksAdapter extends RecyclerView.Adapter<TracksHolder> {
-    private ArrayList<Track> tracks = new ArrayList<>();
+    private OnItemClickListener onClickListener;
 
-    public void setTracks(ArrayList<Track> tracks) {
-        this.tracks = tracks;
-        this.notifyDataSetChanged();
+    private final AsyncListDiffer<Track> differ = new AsyncListDiffer<>(this, new DiffUtil.ItemCallback<Track>() {
+        @Override
+        public boolean areItemsTheSame(@NonNull Track oldItem, @NonNull Track newItem) {
+            return oldItem.getId() == newItem.getId();
+        }
+
+        @SuppressLint("DiffUtilEquals")
+        @Override
+        public boolean areContentsTheSame(@NonNull Track oldItem, @NonNull Track newItem) {
+            return oldItem.equals(newItem);
+        }
+    });
+
+    public RecyclerViewTracksAdapter(OnItemClickListener onClickListener) {
+        this.onClickListener = onClickListener;
     }
 
-    public RecyclerViewTracksAdapter(ArrayList<Track> tracks) {
-        this.tracks = tracks;
+    public RecyclerViewTracksAdapter() {}
+
+    public void setTracks(ArrayList<Track> tracks) {
+        differ.submitList(tracks);
+    }
+
+    public void setOnClickListener(OnItemClickListener onClickListener) {
+        this.onClickListener = onClickListener;
     }
 
     @NonNull
@@ -33,18 +55,26 @@ public class RecyclerViewTracksAdapter extends RecyclerView.Adapter<TracksHolder
 
     @Override
     public void onBindViewHolder(@NonNull TracksHolder holder, int position) {
-        Track currentTrack = tracks.get(position);
+        Track currentTrack = differ.getCurrentList().get(position);
 
-        holder.trackName.setText(currentTrack.getName());
-        holder.trackAuthors.setText(currentTrack.getAuthor());
+        holder.trackName.setText(currentTrack.getTitle());
+        holder.trackAuthors.setText(currentTrack.getArtists());
         holder.trackFavorite.setChecked(currentTrack.getIsFavorite());
 
-        // TODO: Change this background to a real
-        holder.trackImage.setImageResource(R.drawable.basic_background);
+        Glide
+                .with(holder.trackImage)
+                .load(currentTrack.getAlbumImage())
+                .centerCrop()
+                .placeholder(R.drawable.placeholder)
+                .into(holder.trackImage);
+
+        holder.itemView.setOnClickListener(view -> {
+            onClickListener.onItemClick(view, position);
+        });
     }
 
     @Override
     public int getItemCount() {
-        return tracks.size();
+        return differ.getCurrentList().size();
     }
 }

@@ -23,6 +23,10 @@ public class RecycleViewPlaylistAdapter extends RecyclerView.Adapter<PlaylistHol
         this.playlists = playlists;
     }
 
+    public RecycleViewPlaylistAdapter() {
+        this.playlists = new ArrayList<>();
+    }
+
     @NonNull
     @Override
     public PlaylistHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

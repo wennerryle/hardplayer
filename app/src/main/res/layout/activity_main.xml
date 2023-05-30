@@ -30,6 +30,25 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
+        <FrameLayout
+            android:id="@+id/player_seekbar_timer_framelayout"
+            android:layout_width="wrap_content"
+            android:alpha="0"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/player_floating"
+            android:layout_gravity="center"
+            android:background="#000000"
+            android:elevation="1dp">
+            <TextView
+                android:id="@+id/player_seekbar_timer"
+                android:textColor="#ffffff"
+                android:padding="14dp"
+                android:textStyle="bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="" />
+        </FrameLayout>
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -39,14 +58,14 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
+            android:id="@+id/player_back_background"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/basic_background" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/player"
