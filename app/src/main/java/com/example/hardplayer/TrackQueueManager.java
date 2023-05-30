@@ -23,6 +23,7 @@ public class TrackQueueManager {
 
     public static void setTracksQueue(ArrayList<Track> tracksQueue, int startPosition) {
         TrackQueueManager.tracksQueue = tracksQueue;
+        TrackQueueManager.currentIndexPosition = startPosition;
     }
 
     public static void setTracksQueue(ArrayList<Track> tracksQueue) {
